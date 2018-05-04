@@ -7,6 +7,15 @@ linearModel <- function(dataX, dataY) {
     plot(dataX, dataY, col = "blue")
     abline(lsrl, col = "green")
 
+    # Residuals Plot
+    #x11()
+    #plot(dataX, lsrl$residuals)
+
+    cat("Pearson's R:", cor(dataX, dataY))
+    print(lsrl)
+    cat("SSR:", sum(resid(lsrl) ^ 2))
+    cat("\n========================\n")
+
     return(lsrl)
 }
 
@@ -15,13 +24,9 @@ data6cim = read.csv("data/6cim.csv", header = TRUE)
 dataCombinedVolts = c(data4cim$VOLT, data6cim$VOLT)
 dataCombinedAmps  = c(data4cim$TOTAL.AMP, data6cim$TOTAL.AMP)
 
-linearModel(data4cim$TOTAL.AMP, data4cim$VOLT)
-linearModel(data6cim$TOTAL.AMP, data6cim$VOLT)
-linearModel(dataCombinedAmps, dataCombinedVolts)
-
-# Residuals Plot
-#x11()
-#plot(data4cim$TOTAL.AMP, lsrl$residuals)
+lm4cim = linearModel(data4cim$TOTAL.AMP, data4cim$VOLT)
+lm6cim = linearModel(data6cim$TOTAL.AMP, data6cim$VOLT)
+lmCombined = linearModel(dataCombinedAmps, dataCombinedVolts)
 
 Sys.sleep(1000)
 #readline(prompt="Press [enter] to quit")
