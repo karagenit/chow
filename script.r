@@ -11,10 +11,10 @@ linearModel <- function(dataX, dataY) {
     #x11()
     #plot(dataX, lsrl$residuals)
 
-    cat("Pearson's R:", cor(dataX, dataY))
-    print(lsrl)
-    cat("SSR:", sum(resid(lsrl) ^ 2))
-    cat("\n========================\n")
+    #cat("Pearson's R:", cor(dataX, dataY))
+    #print(lsrl)
+    #cat("SSR:", sum(resid(lsrl) ^ 2))
+    #cat("\n========================\n")
 
     return(lsrl)
 }
@@ -28,5 +28,15 @@ lm4cim = linearModel(data4cim$TOTAL.AMP, data4cim$VOLT)
 lm6cim = linearModel(data6cim$TOTAL.AMP, data6cim$VOLT)
 lmCombined = linearModel(dataCombinedAmps, dataCombinedVolts)
 
+ssr4cim = sum(resid(lm4cim) ^ 2)
+ssr6cim = sum(resid(lm6cim) ^ 2)
+ssrCombo = sum(resid(lmCombined) ^ 2)
+
+k = 3
+n4cim = length(data4cim$VOLT)
+n6cim = length(data6cim$VOLT)
+
+fstat = ((ssrCombo - (ssr4cim + ssr6cim)) / k) / ((ssr4cim + ssr6cim) / (n4cim + n6cim - (2 * k)))
+print(fstat)
 Sys.sleep(1000)
 #readline(prompt="Press [enter] to quit")
