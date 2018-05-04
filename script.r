@@ -35,8 +35,15 @@ ssrCombo = sum(resid(lmCombined) ^ 2)
 k = 3
 n4cim = length(data4cim$VOLT)
 n6cim = length(data6cim$VOLT)
+df = n4cim + n6cim - (2 * k)
 
-fstat = ((ssrCombo - (ssr4cim + ssr6cim)) / k) / ((ssr4cim + ssr6cim) / (n4cim + n6cim - (2 * k)))
-print(fstat)
+fstat = ((ssrCombo - (ssr4cim + ssr6cim)) / k) / ((ssr4cim + ssr6cim) / (df))
+pval = pf(fstat, k, df)
+
+cat("k:", k, "\n")
+cat("df:", df, "\n")
+cat("F:", fstat, "\n")
+cat("P-Value:", pval, "\n")
+
 Sys.sleep(1000)
 #readline(prompt="Press [enter] to quit")
