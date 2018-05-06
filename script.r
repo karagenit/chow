@@ -50,8 +50,8 @@ dataB$x = dataBfile$TOTAL.AMP
 dataB$y = dataBfile$VOLT
 
 # Filter Outliers (optional)
-#dataA = filterOutliers(dataA)
-#dataB = filterOutliers(dataB)
+dataA = removeOutliers(dataA)
+dataB = removeOutliers(dataB)
 
 # Only keep every 5th element (optional)
 #dataAamps = dataAamps[seq(1, length(dataAamps), 5)]
