@@ -16,7 +16,7 @@ linearModel <- function(dataX, dataY) {
     x11()
     plot(dataXnorm, dataYnorm, col = "blue")
     points(dataXout, dataYout, col = "red")
-    abline(lsrl, col = "green")
+    abline(lm(dataYnorm ~ dataXnorm), col = "green")
 
     # Residuals Plot
     #x11()
@@ -27,7 +27,7 @@ linearModel <- function(dataX, dataY) {
     #cat("SSR:", sum(resid(lsrl) ^ 2))
     #cat("\n========================\n")
 
-    return(lsrl)
+    return(list(x=dataXnorm, y=dataYnorm))
 }
 
 # Load CIM Data
@@ -49,10 +49,21 @@ dataBvolts = data6cim$VOLT
 dataCombinedVolts = c(dataAvolts, dataBvolts)
 dataCombinedAmps  = c(dataAamps, dataBamps)
 
-# Find linear models
-lm4cim = linearModel(dataAamps, dataAvolts)
-lm6cim = linearModel(dataBamps, dataBvolts)
-lmCombined = linearModel(dataCombinedAmps, dataCombinedVolts)
+# Find linear models, filter outliers
+dataA = linearModel(dataAamps, dataAvolts)
+dataAamps = dataA$x
+dataAvolts = dataA$y
+lm4cim = lm(dataAvolts ~ dataAamps)
+
+dataB = linearModel(dataBamps, dataBvolts)
+dataBamps = dataB$x
+dataBvolts = dataB$y
+lm6cim = lm(dataBvolts ~ dataBamps)
+
+dataAB = linearModel(dataCombinedAmps, dataCombinedVolts)
+dataCombinedAmps = dataAB$x
+dataCombinedVolts = dataAB$y
+lmCombined = lm(dataCombinedVolts ~ dataCombinedAmps)
 
 # Find SSRs
 ssr4cim = sum(resid(lm4cim) ^ 2)
