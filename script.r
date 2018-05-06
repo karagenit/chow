@@ -3,15 +3,26 @@
 linearModel <- function(dataX, dataY) {
     lsrl = lm(dataY ~ dataX)
 
+    # Filtering Outliers
+    resMean = mean(lsrl$residuals)
+    resSD = sd(lsrl$residuals)
+    resZ = (lsrl$residuals - resMean) / resSD
+
+    dataXnorm = dataX[abs(resZ) < 3]
+    dataYnorm = dataY[abs(resZ) < 3]
+    dataXout  = dataX[abs(resZ) > 3]
+    dataYout  = dataY[abs(resZ) > 3]
+
     x11()
-    plot(dataX, dataY, col = "blue")
+    plot(dataXnorm, dataYnorm, col = "blue")
+    points(dataXout, dataYout, col = "red")
     abline(lsrl, col = "green")
 
     # Residuals Plot
     #x11()
     #plot(dataX, lsrl$residuals)
 
-    #cat("Pearson's R:", cor(dataX, dataY))
+    #cat("Pearson's R:", cor(dataX, dataY), "\n")
     #print(lsrl)
     #cat("SSR:", sum(resid(lsrl) ^ 2))
     #cat("\n========================\n")
@@ -29,10 +40,10 @@ dataBamps = data6cim$TOTAL.AMP
 dataBvolts = data6cim$VOLT
 
 # Only keep every 5th element
-dataAamps = dataAamps[seq(1, length(dataAamps), 5)]
-dataAvolts = dataAvolts[seq(1, length(dataAvolts), 5)]
-dataBamps = dataBamps[seq(1, length(dataBamps), 5)]
-dataBvolts = dataBvolts[seq(1, length(dataBvolts), 5)]
+#dataAamps = dataAamps[seq(1, length(dataAamps), 5)]
+#dataAvolts = dataAvolts[seq(1, length(dataAvolts), 5)]
+#dataBamps = dataBamps[seq(1, length(dataBamps), 5)]
+#dataBvolts = dataBvolts[seq(1, length(dataBvolts), 5)]
 
 # Find combined data set
 dataCombinedVolts = c(dataAvolts, dataBvolts)
