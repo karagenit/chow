@@ -34,6 +34,13 @@ getOutliers <- function(dataset) {
     return(datasetOutliers)
 }
 
+removeDuplicates <- function(dataset) {
+    datasetRemoved = list()
+    datasetRemoved$x = dataset$x[c(TRUE, diff(dataset$x) != 0)]
+    datasetRemoved$y = dataset$y[c(TRUE, diff(dataset$x) != 0)]
+    return(datasetRemoved)
+}
+
 # Datasets
 dataA = list()
 dataB = list()
@@ -53,11 +60,9 @@ dataB$y = dataBfile$VOLT
 dataA = removeOutliers(dataA)
 dataB = removeOutliers(dataB)
 
-# Only keep every 5th element (optional)
-#dataAamps = dataAamps[seq(1, length(dataAamps), 5)]
-#dataAvolts = dataAvolts[seq(1, length(dataAvolts), 5)]
-#dataBamps = dataBamps[seq(1, length(dataBamps), 5)]
-#dataBvolts = dataBvolts[seq(1, length(dataBvolts), 5)]
+# Remove Duplicate Current Readings (optional)
+dataA = removeDuplicates(dataA)
+dataB = removeDuplicates(dataB)
 
 # Find combined data set
 dataAB$x = c(dataA$x, dataB$x)
