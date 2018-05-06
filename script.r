@@ -1,87 +1,98 @@
 #!/usr/bin/env Rscript
 
-linearModel <- function(dataX, dataY) {
-    lsrl = lm(dataY ~ dataX)
+removeOutliers <- function(dataset) {
+    datasetRemoved = list()
 
-    # Filtering Outliers
+    lsrl = lm(dataset$y ~ dataset$x)
+
+    # Find Residual Statistics
     resMean = mean(lsrl$residuals)
     resSD = sd(lsrl$residuals)
     resZ = (lsrl$residuals - resMean) / resSD
 
-    dataXnorm = dataX[abs(resZ) < 3]
-    dataYnorm = dataY[abs(resZ) < 3]
-    dataXout  = dataX[abs(resZ) > 3]
-    dataYout  = dataY[abs(resZ) > 3]
+    # Keep Only Points where Residual Z-Score < 3
+    datasetRemoved$x = dataset$x[abs(resZ) < 3]
+    datasetRemoved$y = dataset$y[abs(resZ) < 3]
 
-    x11()
-    plot(dataXnorm, dataYnorm, col = "blue")
-    points(dataXout, dataYout, col = "red")
-    abline(lm(dataYnorm ~ dataXnorm), col = "green")
-
-    # Residuals Plot
-    #x11()
-    #plot(dataX, lsrl$residuals)
-
-    #cat("Pearson's R:", cor(dataX, dataY), "\n")
-    #print(lsrl)
-    #cat("SSR:", sum(resid(lsrl) ^ 2))
-    #cat("\n========================\n")
-
-    return(list(x=dataXnorm, y=dataYnorm))
+    return(datasetRemoved)
 }
 
-# Load CIM Data
-data4cim = read.csv("data/4cim.csv", header = TRUE)
-data6cim = read.csv("data/4minicim.csv", header = TRUE)
+getOutliers <- function(dataset) {
+    datasetOutliers = list()
 
-dataAamps = data4cim$TOTAL.AMP
-dataAvolts = data4cim$VOLT
-dataBamps = data6cim$TOTAL.AMP
-dataBvolts = data6cim$VOLT
+    lsrl = lm(dataset$y ~ dataset$x)
 
-# Only keep every 5th element
+    # Find Residual Statistics
+    resMean = mean(lsrl$residuals)
+    resSD = sd(lsrl$residuals)
+    resZ = (lsrl$residuals - resMean) / resSD
+
+    # Keep Only Points where Residual Z-Score > 3
+    datasetOutliers$x = dataset$x[abs(resZ) > 3]
+    datasetOutliers$y = dataset$y[abs(resZ) > 3]
+
+    return(datasetOutliers)
+}
+
+# Datasets
+dataA = list()
+dataB = list()
+dataAB = list()
+
+# Read Files
+dataAfile = read.csv("data/4cim.csv", header = TRUE)
+dataBfile = read.csv("data/4minicim.csv", header = TRUE)
+
+# Assign to Datasets
+dataA$x = dataAfile$TOTAL.AMP
+dataA$y = dataAfile$VOLT
+dataB$x = dataBfile$TOTAL.AMP
+dataB$y = dataBfile$VOLT
+
+# Filter Outliers (optional)
+#dataA = filterOutliers(dataA)
+#dataB = filterOutliers(dataB)
+
+# Only keep every 5th element (optional)
 #dataAamps = dataAamps[seq(1, length(dataAamps), 5)]
 #dataAvolts = dataAvolts[seq(1, length(dataAvolts), 5)]
 #dataBamps = dataBamps[seq(1, length(dataBamps), 5)]
 #dataBvolts = dataBvolts[seq(1, length(dataBvolts), 5)]
 
 # Find combined data set
-dataCombinedVolts = c(dataAvolts, dataBvolts)
-dataCombinedAmps  = c(dataAamps, dataBamps)
+dataAB$x = c(dataA$x, dataB$x)
+dataAB$y = c(dataA$y, dataB$y)
 
-# Find linear models, filter outliers
-dataA = linearModel(dataAamps, dataAvolts)
-dataAamps = dataA$x
-dataAvolts = dataA$y
-lm4cim = lm(dataAvolts ~ dataAamps)
+# TODO correlation coefficient for each dataset?
+# TODO display LSRL for each set?
+# TODO keep original dataset, plot outliers
 
-dataB = linearModel(dataBamps, dataBvolts)
-dataBamps = dataB$x
-dataBvolts = dataB$y
-lm6cim = lm(dataBvolts ~ dataBamps)
+# Plot Datasets (optional)
+x11()
+plot(dataA$x, dataA$y, main="Motor Comparison, Amps vs. Volts", xlab="Amps", ylab="Volts", col="blue")
+points(dataB$x, dataB$y, col="green")
+abline(lm(dataA$y ~ dataA$x), col="blue")
+abline(lm(dataB$y ~ dataB$x), col="green")
+abline(lm(dataAB$y ~ dataAB$x), col="black")
 
-dataAB = linearModel(dataCombinedAmps, dataCombinedVolts)
-dataCombinedAmps = dataAB$x
-dataCombinedVolts = dataAB$y
-lmCombined = lm(dataCombinedVolts ~ dataCombinedAmps)
+# TODO avoid recomputing Linear Models, store in dataA$lm? Also store dataA$residuals? (Or just dataA$lm$residuals)
 
 # Find SSRs
-ssr4cim = sum(resid(lm4cim) ^ 2)
-ssr6cim = sum(resid(lm6cim) ^ 2)
-ssrCombo = sum(resid(lmCombined) ^ 2)
+dataA$ssr = sum(resid(lm(dataA$y ~ dataA$x)) ^ 2)
+dataB$ssr = sum(resid(lm(dataB$y ~ dataB$x)) ^ 2)
+dataAB$ssr = sum(resid(lm(dataAB$y ~ dataAB$x)) ^ 2)
 
 # Do Chow Test to find F statistic
 k = 3
-n4cim = length(dataAvolts)
-n6cim = length(dataBvolts)
-df = n4cim + n6cim - (2 * k)
+df = length(dataA$x) + length(dataB$x) - (2 * k)
 
-fstat = ((ssrCombo - (ssr4cim + ssr6cim)) / k) / ((ssr4cim + ssr6cim) / (df))
+fstat = ((dataAB$ssr - (dataA$ssr + dataB$ssr)) / k) / ((dataA$ssr + dataB$ssr) / (df))
 pval = pf(fstat, k, df)
 
-cat("SSR 4CIM:", ssr4cim, "\n")
-cat("SSR 6CIM:", ssr6cim, "\n")
-cat("SSR Combo:", ssrCombo, "\n")
+# Print Info
+cat("SSR A:", dataA$ssr, "\n")
+cat("SSR B:", dataB$ssr, "\n")
+cat("SSR AB:", dataAB$ssr, "\n")
 cat("k:", k, "\n")
 cat("df:", df, "\n")
 cat("F:", fstat, "\n")
