@@ -47,8 +47,14 @@ dataB = list()
 dataAB = list()
 
 # Read Files
-dataAfile = read.csv("data/4cim.csv", header = TRUE)
-dataBfile = read.csv("data/4minicim.csv", header = TRUE)
+# NOTE: we can't just readline() b/c running this script w/ Rscript is "non-interactive"...
+cat("First File to Read: ")
+fileA = readLines(file("stdin"), 1)
+dataAfile = read.csv(paste("data/", fileA, ".csv", sep=""), header = TRUE)
+cat("Second File to Read: ")
+fileB = readLines(file("stdin"), 1)
+dataBfile = read.csv(paste("data/", fileB, ".csv", sep=""), header = TRUE)
+closeAllConnections()
 
 # Assign to Datasets
 dataA$x = dataAfile$TOTAL.AMP
@@ -103,5 +109,7 @@ cat("df:", df, "\n")
 cat("F:", fstat, "\n")
 cat("P-Value:", pval, "\n")
 
-Sys.sleep(1000)
-#readline(prompt="Press [enter] to quit")
+# Basically a bunch of hacks
+cat("Press [Enter] to Quit...")
+enter = readLines(file("stdin"), 1)
+closeAllConnections()
