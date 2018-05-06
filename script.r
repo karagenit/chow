@@ -11,8 +11,8 @@ removeOutliers <- function(dataset) {
     resZ = (lsrl$residuals - resMean) / resSD
 
     # Keep Only Points where Residual Z-Score < 3
-    datasetRemoved$x = dataset$x[abs(resZ) < 3]
-    datasetRemoved$y = dataset$y[abs(resZ) < 3]
+    datasetRemoved$x = dataset$x[abs(resZ) < 1.25]
+    datasetRemoved$y = dataset$y[abs(resZ) < 1.25]
 
     return(datasetRemoved)
 }
@@ -94,7 +94,7 @@ dataB$ssr = sum(resid(lm(dataB$y ~ dataB$x)) ^ 2)
 dataAB$ssr = sum(resid(lm(dataAB$y ~ dataAB$x)) ^ 2)
 
 # Do Chow Test to find F statistic
-k = 3
+k = 4
 df = length(dataA$x) + length(dataB$x) - (2 * k)
 
 fstat = ((dataAB$ssr - (dataA$ssr + dataB$ssr)) / k) / ((dataA$ssr + dataB$ssr) / (df))
