@@ -11,23 +11,6 @@ removeOutliers <- function(dataset) {
     return(datasetRemoved)
 }
 
-getOutliers <- function(dataset) {
-    datasetOutliers = list()
-
-    lsrl = lm(dataset$y ~ dataset$x)
-
-    # Find Residual Statistics
-    resMean = mean(lsrl$residuals)
-    resSD = sd(lsrl$residuals)
-    resZ = (lsrl$residuals - resMean) / resSD
-
-    # Keep Only Points where Residual Z-Score > 3
-    datasetOutliers$x = dataset$x[abs(resZ) > 3]
-    datasetOutliers$y = dataset$y[abs(resZ) > 3]
-
-    return(datasetOutliers)
-}
-
 removeDuplicates <- function(dataset) {
     datasetRemoved = list()
     datasetRemoved$x = dataset$x[c(TRUE, diff(dataset$x) != 0)]
