@@ -71,11 +71,10 @@ dataB$ssr = sum(resid(lm(dataB$y ~ dataB$x)) ^ 2)
 dataAB$ssr = sum(resid(lm(dataAB$y ~ dataAB$x)) ^ 2)
 
 # Do Chow Test to find F statistic
-k = 4
+k = 2
 df = length(dataA$x) + length(dataB$x) - (2 * k)
 
 fstat = ((dataAB$ssr - (dataA$ssr + dataB$ssr)) / k) / ((dataA$ssr + dataB$ssr) / (df))
-pval = pf(fstat, k, df)
 
 # Print Info
 cat("SSR A:", dataA$ssr, "\n")
@@ -84,7 +83,7 @@ cat("SSR AB:", dataAB$ssr, "\n")
 cat("k:", k, "\n")
 cat("df:", df, "\n")
 cat("F:", fstat, "\n")
-cat("P-Value:", pval, "\n")
+cat("P-Value:", pf(fstat, k, df, lower.tail=FALSE), "\n")
 
 # Basically a bunch of hacks
 cat("Press [Enter] to Quit...")
