@@ -4,16 +4,10 @@ removeOutliers <- function(dataset) {
     datasetRemoved = list()
 
     lsrl = lm(dataset$y ~ dataset$x)
+    cookd = cooks.distance(lsrl)
 
-    # Find Residual Statistics
-    resMean = mean(lsrl$residuals)
-    resSD = sd(lsrl$residuals)
-    resZ = (lsrl$residuals - resMean) / resSD
-
-    # Keep Only Points where Residual Z-Score < 3
-    datasetRemoved$x = dataset$x[abs(resZ) < 1.25]
-    datasetRemoved$y = dataset$y[abs(resZ) < 1.25]
-
+    datasetRemoved$x = dataset$x[cookd < (2/length(dataset$x))]
+    datasetRemoved$y = dataset$y[cookd < (2/length(dataset$x))]
     return(datasetRemoved)
 }
 
