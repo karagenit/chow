@@ -77,13 +77,13 @@ df = length(dataA$x) + length(dataB$x) - (2 * k)
 fstat = ((dataAB$ssr - (dataA$ssr + dataB$ssr)) / k) / ((dataA$ssr + dataB$ssr) / (df))
 
 # Print Info
-cat("SSR A:", dataA$ssr, "\n")
-cat("SSR B:", dataB$ssr, "\n")
-cat("SSR AB:", dataAB$ssr, "\n")
-cat("k:", k, "\n")
-cat("df:", df, "\n")
-cat("F:", fstat, "\n")
-cat("P-Value:", pf(fstat, k, df, lower.tail=FALSE), "\n")
+cat("SSR A:\t", dataA$ssr, "\n")
+cat("SSR B:\t", dataB$ssr, "\n")
+cat("SSR AB:\t", dataAB$ssr, "\n")
+cat("k:\t", k, "\n")
+cat("df:\t", df, "\n")
+cat("F Stat:\t", fstat, "\n")
+cat("P-Val:\t", pf(fstat, k, df, lower.tail=FALSE), "\n")
 
 # Basically a bunch of hacks
 cat("Press [Enter] to Quit...")
